@@ -1,5 +1,5 @@
-"use client"
-import React from 'react'
+"use client";
+import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,26 +12,27 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
+import Link from "next/link";
 
-function Navbar({title}) {
-    const[auth, setAuth] = React.useState(true);
-    const [anchorEl, setAnchorEl] = React.useState(null);
+function Navbar() {
+  const [auth, setAuth] = React.useState(true);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
-    const handleChange = (event) => {
-      setAuth(event.target.checked);
-    };
+  const handleChange = (event) => {
+    setAuth(event.target.checked);
+  };
 
-    const handleMenu = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static" sx={{backgroundColor:"#212121"}}>
+        <AppBar position="static" sx={{ backgroundColor: "#212121" }}>
           <Toolbar>
             <IconButton
               size="large"
@@ -43,7 +44,9 @@ function Navbar({title}) {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {title}
+              <Link href="/" style={{fontFamily:"Times New Roman"}}>
+                The Social App
+              </Link>
             </Typography>
             {auth && (
               <div>
@@ -84,4 +87,4 @@ function Navbar({title}) {
   );
 }
 
-export default Navbar
+export default Navbar;

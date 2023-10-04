@@ -5,10 +5,10 @@ import CustomCard from "../cards/CustomCard";
 
 function MainContent() {
   const cards = [
-    { title: "Video Call" },
-    { title: "Audio Call" },
-    { title: "Direct Message" },
-    { title: "Group Chat" },
+    { title: "Video Call", url: "videocall" },
+    { title: "Audio Call", url: "audiocall" },
+    { title: "Direct Message", url: "direct_message" },
+    { title: "Group Chat", url: "groupchat" },
   ];
 
   return (
@@ -17,7 +17,7 @@ function MainContent() {
         <Grid container rowSpacing={8} columnSpacing={{ xs: 1, sm: 2, md: 5 }}>
           {cards.map((card, index) => (
             <Grid item xs={12} md={6} key={index}>
-              <CustomCard title={card.title} />
+              <CustomCard title={card.title} url={card.url} />
             </Grid>
           ))}
         </Grid>

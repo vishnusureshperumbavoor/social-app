@@ -11,6 +11,7 @@ function groupchat() {
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [showChat, setShowChat] = useState(false);
+
   const joinRoom = () => {
     if (username !== "" && room != "") {
       const data = {
@@ -21,17 +22,20 @@ function groupchat() {
       setShowChat(true);
     }
   };
+
   useEffect(() => {
     socket.on("joined_room", (data) => {
       console.log(`${data.username} has joined room ${data.room}`);
     });
   });
+
   return (
     <>
-      <Navbar title={"Chat with Humans"} />
+      <Navbar/>
       <div className="App">
         {!showChat ? (
           <div className="joinChatContainer">
+            <h1>Chat with humans</h1>
             <input
               type="text"
               placeholder="enter username"
