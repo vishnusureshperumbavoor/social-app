@@ -15,17 +15,39 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
+  socket.emit("user_id",socket.id);
 
+  // group messaging
   socket.on("join_room", (data) => {
     socket.join(data.room);
-    socket.to(data.room).emit("joined_room",data)
-    console.log(`User ${data.username} with ID ${socket.id} has joined room: ${data.room}`);
+    socket.to(data.room).emit("joined_room", data);
+    console.log(
+      `User ${data.username} with ID ${socket.id} has joined room: ${data.room}`
+    );
   });
 
   socket.on("send_message", (data) => {
+    console.log(data);
     socket.to(data.room).emit("receive_message", data);
   });
 
+  // video call
+  socket.on("call_user", (data) => {
+    console.log("video call data");
+    console.log(data);
+    socket.to(data.userToCall).emit("call_user", {
+      user_id: socket.id,
+      signal: data.signalData,
+      from: data.from,
+      name: data.name,
+    });
+  });
+
+  socket.on("answer_call", (data) => {
+    socket.to(data.to).emit("call_accepted", data.signal);
+  });
+
+  // disconnect
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
   });

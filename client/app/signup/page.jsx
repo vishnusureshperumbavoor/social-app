@@ -9,6 +9,7 @@ import Navbar from "../components/Navbar";
 import { Card } from "@mui/material";
 import { auth, provider } from "../auth/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import Link from "next/link";
 
 function signup() {
   const [email, setEmail] = useState("");
@@ -117,18 +118,20 @@ function signup() {
                 style={{ width: "200px", height: "40px" }}
                 onClick={handleSignUp}
               >
-                <span style={{ fontSize: "14px" }}>Sign up with Google</span>
+                <span style={{ fontSize: "14px" }}>Sign In with Google</span>
               </GoogleLoginButton>
               <BufferLoginButton
                 className="mt-3 mb-3"
                 style={{ width: "200px", height: "40px" }}
               >
-                <span style={{ fontSize: "14px" }}>Sign up with OTP</span>
+                <span style={{ fontSize: "14px" }}>Sign In with OTP</span>
               </BufferLoginButton>
             </div>
             <div className="text-center">
               <a href="/" style={{ color: "white" }}>
-                back to login page
+                <Link href="/login">
+                go to login page
+                </Link>
               </a>
             </div>
           </Form>

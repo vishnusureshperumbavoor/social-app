@@ -12,7 +12,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import Link from "next/link";
 
 function Navbar() {
   const [auth, setAuth] = React.useState(true);
@@ -43,10 +42,8 @@ function Navbar() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <Link href="/" style={{fontFamily:"Times New Roman"}}>
-                The Social App
-              </Link>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} style={{fontFamily:"Times New Roman"}}>
+              The Social App
             </Typography>
             {auth && (
               <div>

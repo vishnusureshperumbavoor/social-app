@@ -1,47 +1,128 @@
-"use client"
-import React, { Component } from "react";
-import Navbar from "../components/Navbar";
-import { Button, Form, FormGroup, Label, Input } from "reactstrap";
+"use client";
+import React, { useState } from "react";
+import { Button, Form, FormGroup, Input } from "reactstrap";
 import {
-  FacebookLoginButton,
+  BufferLoginButton,
   GoogleLoginButton,
 } from "react-social-login-buttons";
-import { GoogleLogin } from "react-google-login";
-import { FacebookProvider, LoginButton } from "react-facebook";
+import Navbar from "../components/Navbar";
+import { Card } from "@mui/material";
+import { auth, provider } from "../auth/firebase";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 function login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const handleSignUp = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+        console.log(user.displayName);
+        localStorage.setItem("displayName", user.displayName);
+        localStorage.setItem("photoURL", user.photoURL);
+        redirect("/");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+      });
+  };
+
   return (
     <div>
       <Navbar />
-      <div>
-        <Form className="login-form">
-          <h1 className="text-center">
-            <span className="font-weight-bold">Login Form</span>
-          </h1>
-          <img />
-          <FormGroup>
-            <Label>Email</Label>
-            <Input type="email" placeholder="Email" />
-          </FormGroup>
-          <FormGroup>
-            <Label>Password</Label>
-            <Input type="password" placeholder="Password" />
-          </FormGroup>
-          <Button className="btn-lg btn-block">Log in</Button>
-          <div className="text-center pt-3">Or</div>
-          <FacebookLoginButton className="mt-3 mb-3" />
-          <GoogleLoginButton buttonText="Login" className="mt-3 mb-3" />
-          <GoogleLogin
-            // clientId="633129028687-bgjj935aa6dv1rocm52ku7gd8ec40afa.apps.googleusercontent.com"
-            clientId="633129028687-bgjj935aa6dv1rocm52ku7gd8ec40afa.apps.googleusercontent.com"
-            buttonText="Login with Google"
-            cookiePolicy={"single_host_origin"}
-          />
-
-          <div className="text-center">
-            <a href="/sign-up">Sign up</a>
-          </div>
-        </Form>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "90vh",
+        }}
+      >
+        <Card
+          className="signup-form"
+          sx={{
+            width: "500px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            backgroundColor: "#212121",
+          }}
+        >
+          <Form
+            className="signup-form"
+            style={{ margin: "10px", textAlign: "center" }}
+          >
+            <h1 className="text-center">
+              <span className="font-weight-bold" style={{ color: "white" }}>
+                Log In Form
+              </span>
+            </h1>
+            
+            <FormGroup style={{ margin: "10px" }}>
+              <Input
+                type="email"
+                placeholder="Email"
+                style={{ height: "30px" }}
+              />
+            </FormGroup>
+            <FormGroup style={{ margin: "10px" }}>
+              <Input
+                type="password"
+                placeholder="Password"
+                style={{ height: "30px" }}
+              />
+            </FormGroup>
+            
+            <Button
+              className="btn-lg btn-block"
+              style={{ margin: "10px", width: "200px", height: "40px" }}
+            >
+              Please Sign Up here:-
+            </Button>
+            <div
+              className="text-center pt-3"
+              style={{ textAlign: "center", color: "white" }}
+            >
+              Or
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <GoogleLoginButton
+                className="mt-3 mb-3"
+                style={{ width: "200px", height: "40px" }}
+                onClick={handleSignUp}
+              >
+                <span style={{ fontSize: "14px" }}>Log In with Google</span>
+              </GoogleLoginButton>
+              <BufferLoginButton
+                className="mt-3 mb-3"
+                style={{ width: "200px", height: "40px" }}
+              >
+                <span style={{ fontSize: "14px" }}>Log In with OTP</span>
+              </BufferLoginButton>
+            </div>
+            <div className="text-center">
+              <a href="/" style={{ color: "white" }}>
+                <Link href="/signup">go to signup page</Link>
+              </a>
+            </div>
+          </Form>
+        </Card>
       </div>
     </div>
   );
