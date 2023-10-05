@@ -27,22 +27,39 @@ function groupchat() {
     socket.on("joined_room", (data) => {
       console.log(`${data.username} has joined room ${data.room}`);
     });
+    const displayName = localStorage.getItem("displayName");
+    if (displayName) {
+      setUsername(displayName);
+    }
   });
 
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div className="App">
         {!showChat ? (
           <div className="joinChatContainer">
             <h1>Chat with humans</h1>
-            <input
+            {username ? (
+              <></>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="enter username"
+                  onChange={(event) => {
+                    setUsername(event.target.value);
+                  }}
+                />
+              </>
+            )}
+            {/* <input
               type="text"
               placeholder="enter username"
               onChange={(event) => {
                 setUsername(event.target.value);
               }}
-            />
+            /> */}
             <input
               type="text"
               placeholder="enter room id"

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, FormGroup, Input } from "reactstrap";
 import {
   BufferLoginButton,
@@ -8,7 +8,12 @@ import {
 import Navbar from "../components/Navbar";
 import { Card } from "@mui/material";
 import { auth, provider } from "../auth/firebase";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -16,6 +21,7 @@ function login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [phone, setPhone] = useState("+918714267479");
 
   const handleSignUp = () => {
     signInWithPopup(auth, provider)
@@ -24,7 +30,6 @@ function login() {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
         const user = result.user;
-        console.log(user.displayName);
         localStorage.setItem("displayName", user.displayName);
         localStorage.setItem("photoURL", user.photoURL);
         redirect("/");
@@ -36,6 +41,30 @@ function login() {
         const credential = GoogleAuthProvider.credentialFromError(error);
       });
   };
+
+  const handleOTP = async () => {
+    console.log("clicked on it");
+    try {
+      const appVerifier = window.recaptchaVerifier;
+      await signInWithPhoneNumber(auth, phone, appVerifier).then(
+        (confirmation) => {
+          window.confirmationResult = confirmation;
+        }
+      );
+    } catch (error) {
+        alert(error)
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const displayName = localStorage.getItem("displayName");
+    const photoURL = localStorage.getItem("photoURL");
+
+    if (displayName && photoURL) {
+      redirect("/");
+    }
+  }, []);
 
   return (
     <div>
@@ -67,12 +96,13 @@ function login() {
                 Log In Form
               </span>
             </h1>
-            
+
             <FormGroup style={{ margin: "10px" }}>
               <Input
                 type="email"
                 placeholder="Email"
                 style={{ height: "30px" }}
+                name="email"
               />
             </FormGroup>
             <FormGroup style={{ margin: "10px" }}>
@@ -80,9 +110,10 @@ function login() {
                 type="password"
                 placeholder="Password"
                 style={{ height: "30px" }}
+                name="password"
               />
             </FormGroup>
-            
+
             <Button
               className="btn-lg btn-block"
               style={{ margin: "10px", width: "200px", height: "40px" }}
@@ -112,9 +143,11 @@ function login() {
               <BufferLoginButton
                 className="mt-3 mb-3"
                 style={{ width: "200px", height: "40px" }}
+                onClick={handleOTP}
               >
                 <span style={{ fontSize: "14px" }}>Log In with OTP</span>
               </BufferLoginButton>
+              <div id="recaptcha"></div>
             </div>
             <div className="text-center">
               <a href="/" style={{ color: "white" }}>
