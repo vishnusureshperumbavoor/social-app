@@ -40,10 +40,6 @@ function groupchat() {
         {!showChat ? (
           <div className="joinChatContainer">
             <h1>Chat with humans</h1>
-            {username ? (
-              <></>
-            ) : (
-              <>
                 <input
                   type="text"
                   placeholder="enter username"
@@ -51,15 +47,6 @@ function groupchat() {
                     setUsername(event.target.value);
                   }}
                 />
-              </>
-            )}
-            {/* <input
-              type="text"
-              placeholder="enter username"
-              onChange={(event) => {
-                setUsername(event.target.value);
-              }}
-            /> */}
             <input
               type="text"
               placeholder="enter room id"
