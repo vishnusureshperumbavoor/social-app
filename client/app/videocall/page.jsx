@@ -31,11 +31,11 @@ function videocall() {
 
   const myVideoRef = useRef(null);
   const partnerVideoRef = useRef(null);
-  const connectionRef = useRef(null);
+  const socket = useRef(null);
 
   useEffect(() => {
-    const socket = io.connect(process.env.NEXT_PUBLIC_SERVER_URL);
-    socket.on("user_id", (response) => {
+     socket.current = io.connect(process.env.NEXT_PUBLIC_SERVER_URL);
+    socket.current.on("user_id", (response) => {
       setUserId(response);
     });
 
@@ -48,7 +48,7 @@ function videocall() {
         }
       });
 
-    socket.on("call_user", (data) => {
+    socket.current.on("call_user", (data) => {
       setUserId(data.user_id);
       setCaller(data.from);
       setName(data.name);
@@ -58,7 +58,6 @@ function videocall() {
   }, []);
 
   const callUser = (id) => {
-    const socket = io.connect(process.env.NEXT_PUBLIC_SERVER_URL);
     try {
       const peer = new Peer({
         initiator: true,
@@ -67,7 +66,7 @@ function videocall() {
       });
 
       peer.on("signal", (data) => {
-        socket.emit("call_user", {
+        socket.current.emit("call_user", {
           userToCall: id,
           signalData: data,
           from: userId,
@@ -81,12 +80,10 @@ function videocall() {
         }
       });
 
-      socket.on("call_accepted", (signal) => {
+      socket.current.on("call_accepted", (signal) => {
         setCallAccepted(true);
         peer.signal(signal);
       });
-      
-      connectionRef.current = peer;
     } catch (error) {
       alert(error);
       console.error("Error in callUser:", error);
@@ -115,7 +112,6 @@ function videocall() {
       });
 
       peer.signal(callerSignal);
-      connectionRef.current = peer;
       setCallAccepted(true);
 
     } catch (error) {
@@ -125,7 +121,6 @@ function videocall() {
 
   const leaveCall = () => {
     setCallEnded(true);
-    connectionRef.current.destroy();
   };
 
   return (
