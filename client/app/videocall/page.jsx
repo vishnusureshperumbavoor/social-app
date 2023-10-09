@@ -29,6 +29,7 @@ function videocall() {
   const [idToCall, setIdToCall] = useState(""); // Example initial value is an empty string
   const [callEnded, setCallEnded] = useState(false); // Example initial value is false
   const [name, setName] = useState("daddy");
+  const [callerName,setCallerName] = useState("");
 
   const myVideoRef = useRef(null);
   const partnerVideoRef = useRef(null);
@@ -52,7 +53,7 @@ function videocall() {
 
     socket.current.on("call_to_receiver_client", (data) => {
       setCaller(data.from);
-      setName(data.name);
+      setCallerName(data.name);
       setCallerSignal(data.signal);
       setReceivingCall(true);
     });
@@ -186,6 +187,17 @@ function videocall() {
 
               {callAccepted && !callEnded ? (
                 <div className="video">
+                  <Typography
+                    sx={{
+                      backgroundColor: "#8B8000",
+                      color: "white",
+                      borderRadius: "10px 10px 0 0",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {callerName}
+                  </Typography>
                   <video
                     playsInline
                     ref={partnerVideoRef}
@@ -197,7 +209,7 @@ function videocall() {
             </div>
             {receivingCall ? (
               <div className="caller">
-                <h1>{name} is calling...</h1>
+                <h1>{callerName} is calling...</h1>
                 <Button
                   variant="contained"
                   style={{
