@@ -12,6 +12,11 @@ import { Card } from "@mui/material";
 import { createTheme, ThemeProvider, Grid } from "@mui/material";
 require("dotenv").config;
 
+const ringtoneAudio = new Audio("/audio/ringtone.wav");
+ringtoneAudio.preload = "auto";
+ringtoneAudio.loop = true;
+ringtoneAudio.volume = 0.5; 
+
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -56,6 +61,7 @@ function videocall() {
       setCallerName(data.name);
       setCallerSignal(data.signal);
       setReceivingCall(true);
+      ringtoneAudio.play();
     });
 
     socket.current.on("end_on_caller_client", () => {
@@ -105,6 +111,8 @@ function videocall() {
   };
 
   const answerCall = () => {
+    ringtoneAudio.pause();
+    ringtoneAudio.currentTime = 0;
     setReceivingCall(false);
     try {
       const peer = new Peer({
@@ -140,6 +148,8 @@ function videocall() {
 
   const declineCall = () => {
     setReceivingCall(false);
+    ringtoneAudio.pause();
+    ringtoneAudio.currentTime = 0;
   };
 
   const leaveCall = () => {
