@@ -65,7 +65,7 @@ function videocall() {
       setCallerSignal(data.signal);
       setReceivingCall(true);
       setNotCalling(false);
-      ringtoneAudio.play();
+      // ringtoneAudio.play();
     });
 
     socket.current.on("end_on_caller_client", () => {
@@ -184,7 +184,6 @@ function videocall() {
         <Navbar />
         <h1 className="heading">VIDEO CALL</h1>
         <Grid container spacing={2}>
-          
           <Grid item xs={12} md={6}>
             <div
               className={`video-container ${
@@ -234,9 +233,10 @@ function videocall() {
                 </div>
               ) : null}
             </div>
+          </Grid>
+          <Grid item xs={12} md={6}>
 
             {notCalling && (
-              <Grid item xs={12} md={6}>
                 <div className="myId">
                   <Typography
                     style={{ paddingTop: "5px", paddingBottom: "5px" }}
@@ -282,7 +282,6 @@ function videocall() {
                     )}
                   </div>
                 </div>
-              </Grid>
             )}
 
             {callUserId && (
@@ -292,7 +291,7 @@ function videocall() {
                   justifyContent: "center", // Horizontal centering
                   alignItems: "center", // Vertical centering
                   height: "100vh",
-                  textAlign:"center"
+                  textAlign: "center",
                 }}
                 className="caller"
               >
