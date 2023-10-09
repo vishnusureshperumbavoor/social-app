@@ -164,12 +164,23 @@ function videocall() {
               }`}
             >
               <div className="video">
+                <Typography
+                  sx={{
+                    backgroundColor: "#9400d3",
+                    color: "white",
+                    borderRadius: "10px 10px 0 0",
+                    textAlign: "center",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {name}
+                </Typography>
                 <video
                   playsInline
                   muted
                   ref={myVideoRef}
                   autoPlay
-                  style={{ width: "300px" }}
+                  style={{ width: "300px", borderRadius: "0 0 10px 10px" }}
                 />
               </div>
 
@@ -179,7 +190,7 @@ function videocall() {
                     playsInline
                     ref={partnerVideoRef}
                     autoPlay
-                    style={{ width: "300px" }}
+                    style={{ width: "300px", borderRadius: "0 0 10px 10px" }}
                   />
                 </div>
               ) : null}
