@@ -15,7 +15,7 @@ require("dotenv").config;
 const ringtoneAudio = new Audio("/audio/ringtone.wav");
 ringtoneAudio.preload = "auto";
 ringtoneAudio.loop = true;
-ringtoneAudio.volume = 0.5; 
+ringtoneAudio.volume = 0.5;
 
 const darkTheme = createTheme({
   palette: {
@@ -26,15 +26,18 @@ const darkTheme = createTheme({
 function videocall() {
   const [userId, setUserId] = useState("");
   const [stream, setStream] = useState(); // Example initial value is null
-  const [receivingCall, setReceivingCall] = useState(false); // Example initial value is false
   const [caller, setCaller] = useState(""); // Example initial value is an empty string
   const [receiver, setReceiver] = useState(""); // Example initial value is an empty string
   const [callerSignal, setCallerSignal] = useState(null); // Example initial value is null
-  const [callAccepted, setCallAccepted] = useState(false); // Example initial value is false
   const [idToCall, setIdToCall] = useState(""); // Example initial value is an empty string
   const [callEnded, setCallEnded] = useState(false); // Example initial value is false
   const [name, setName] = useState("daddy");
   const [callerName, setCallerName] = useState("");
+
+  const [notCalling, setNotCalling] = useState(true);
+  const [callUserId, setCallUserId] = useState(false);
+  const [receivingCall, setReceivingCall] = useState(false); // Example initial value is false
+  const [callAccepted, setCallAccepted] = useState(false); // Example initial value is false
 
   const myVideoRef = useRef(null);
   const partnerVideoRef = useRef(null);
@@ -61,6 +64,7 @@ function videocall() {
       setCallerName(data.name);
       setCallerSignal(data.signal);
       setReceivingCall(true);
+      setNotCalling(false);
       ringtoneAudio.play();
     });
 
@@ -70,10 +74,13 @@ function videocall() {
       }
       setCallAccepted(false);
       setCallEnded(true);
+      setNotCalling(false);
     });
   }, []);
 
   const callUser = (id) => {
+    setNotCalling(false);
+    setCallUserId(true);
     setReceiver(id);
     setIdToCall("");
     try {
@@ -114,6 +121,7 @@ function videocall() {
     ringtoneAudio.pause();
     ringtoneAudio.currentTime = 0;
     setReceivingCall(false);
+
     try {
       const peer = new Peer({
         initiator: false,
@@ -139,6 +147,7 @@ function videocall() {
 
       peer.signal(callerSignal);
       setCallAccepted(true);
+      setNotCalling(false);
 
       peerRef.current = peer;
     } catch (error) {
@@ -147,12 +156,14 @@ function videocall() {
   };
 
   const declineCall = () => {
+    setNotCalling(true);
     setReceivingCall(false);
     ringtoneAudio.pause();
     ringtoneAudio.currentTime = 0;
   };
 
   const leaveCall = () => {
+    setNotCalling(true);
     const peer = peerRef.current;
     if (peer) {
       peer.destroy();
@@ -173,6 +184,7 @@ function videocall() {
         <Navbar />
         <h1 className="heading">VIDEO CALL</h1>
         <Grid container spacing={2}>
+          
           <Grid item xs={12} md={6}>
             <div
               className={`video-container ${
@@ -222,29 +234,8 @@ function videocall() {
                 </div>
               ) : null}
             </div>
-            {receivingCall ? (
-              <div className="caller">
-                <h1>{callerName} is calling...</h1>
-                <Button
-                  variant="contained"
-                  style={{
-                    backgroundColor: "green",
-                    color: "white",
-                    marginRight: "20px",
-                  }}
-                  onClick={answerCall}
-                >
-                  Answer
-                </Button>
-                <Button
-                  variant="contained"
-                  style={{ backgroundColor: "red", color: "white" }}
-                  onClick={declineCall}
-                >
-                  Decline
-                </Button>
-              </div>
-            ) : (
+
+            {notCalling && (
               <Grid item xs={12} md={6}>
                 <div className="myId">
                   <Typography
@@ -293,6 +284,64 @@ function videocall() {
                 </div>
               </Grid>
             )}
+
+            {callUserId && (
+              <div
+                sx={{
+                  display: "flex",
+                  justifyContent: "center", // Horizontal centering
+                  alignItems: "center", // Vertical centering
+                  height: "100vh",
+                  textAlign:"center"
+                }}
+                className="caller"
+              >
+                <Typography
+                  sx={{
+                    fontWeight: "bolder",
+                    fontSize: "30px",
+                    textAlign: "center",
+                    marginBottom: "4px",
+                  }}
+                >
+                  Calling {receiver}
+                </Typography>
+                <Button
+                  variant="contained"
+                  style={{ backgroundColor: "red", color: "white" }}
+                  onClick={declineCall}
+                >
+                  Decline
+                </Button>
+              </div>
+            )}
+
+            {receivingCall && (
+              <div className="caller">
+                <h1 style={{ marginBottom: "4px" }}>
+                  {callerName} is calling...
+                </h1>
+                <Button
+                  variant="contained"
+                  style={{
+                    backgroundColor: "green",
+                    color: "white",
+                    marginRight: "20px",
+                  }}
+                  onClick={answerCall}
+                >
+                  Answer
+                </Button>
+                <Button
+                  variant="contained"
+                  style={{ backgroundColor: "red", color: "white" }}
+                  onClick={declineCall}
+                >
+                  Decline
+                </Button>
+              </div>
+            )}
+
             {callAccepted && !callEnded ? (
               <div className="end-call">
                 <Button
