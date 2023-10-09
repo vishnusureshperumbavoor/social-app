@@ -244,7 +244,55 @@ function videocall() {
                   Decline
                 </Button>
               </div>
-            ) : null}
+            ) : (
+              <Grid item xs={12} md={6}>
+                <div className="myId">
+                  <Typography
+                    style={{ paddingTop: "5px", paddingBottom: "5px" }}
+                  >
+                    User Id : {userId}
+                  </Typography>
+                  <TextField
+                    id="filled-basic"
+                    label="username"
+                    variant="filled"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    style={{ marginBottom: "1rem", color: "white" }}
+                  />
+                  <CopyToClipboard
+                    text={userId}
+                    style={{ marginBottom: "1rem" }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<AssignmentIcon fontSize="large" />}
+                    >
+                      Copy ID
+                    </Button>
+                  </CopyToClipboard>
+                  <TextField
+                    id="filled-basic"
+                    label="User ID to call"
+                    variant="filled"
+                    value={idToCall}
+                    onChange={(e) => setIdToCall(e.target.value)}
+                  />
+                  <div className="call-button">
+                    {callAccepted && !callEnded ? null : (
+                      <IconButton
+                        color="primary"
+                        aria-label="call"
+                        onClick={() => callUser(idToCall)}
+                      >
+                        <PhoneIcon fontSize="large" />
+                      </IconButton>
+                    )}
+                  </div>
+                </div>
+              </Grid>
+            )}
             {callAccepted && !callEnded ? (
               <div className="end-call">
                 <Button
@@ -256,48 +304,6 @@ function videocall() {
                 </Button>
               </div>
             ) : null}
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <div className="myId">
-              <Typography style={{ paddingTop: "5px", paddingBottom: "5px" }}>
-                User Id : {userId}
-              </Typography>
-              <TextField
-                id="filled-basic"
-                label="username"
-                variant="filled"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={{ marginBottom: "1rem", color: "white" }}
-              />
-              <CopyToClipboard text={userId} style={{ marginBottom: "1rem" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<AssignmentIcon fontSize="large" />}
-                >
-                  Copy ID
-                </Button>
-              </CopyToClipboard>
-              <TextField
-                id="filled-basic"
-                label="User ID to call"
-                variant="filled"
-                value={idToCall}
-                onChange={(e) => setIdToCall(e.target.value)}
-              />
-              <div className="call-button">
-                {callAccepted && !callEnded ? null : (
-                  <IconButton
-                    color="primary"
-                    aria-label="call"
-                    onClick={() => callUser(idToCall)}
-                  >
-                    <PhoneIcon fontSize="large" />
-                  </IconButton>
-                )}
-              </div>
-            </div>
           </Grid>
         </Grid>
       </ThemeProvider>
