@@ -68,6 +68,7 @@ function videocall() {
 
   const callUser = (id) => {
     setReceiver(id);
+    setIdToCall("");
     try {
       const peer = new Peer({
         initiator: true,
