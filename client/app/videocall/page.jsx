@@ -23,6 +23,7 @@ function videocall() {
   const [stream, setStream] = useState(); // Example initial value is null
   const [receivingCall, setReceivingCall] = useState(false); // Example initial value is false
   const [caller, setCaller] = useState(""); // Example initial value is an empty string
+  const [receiver, setReceiver] = useState(""); // Example initial value is an empty string
   const [callerSignal, setCallerSignal] = useState(null); // Example initial value is null
   const [callAccepted, setCallAccepted] = useState(false); // Example initial value is false
   const [idToCall, setIdToCall] = useState(""); // Example initial value is an empty string
@@ -48,14 +49,14 @@ function videocall() {
         }
       });
 
-    socket.current.on("call_user", (data) => {
+    socket.current.on("call_to_receiver_client", (data) => {
       setCaller(data.from);
       setName(data.name);
       setCallerSignal(data.signal);
       setReceivingCall(true);
     });
 
-    socket.current.on("call_ended", () => {
+    socket.current.on("end_on_caller_client", () => {
       if (socket.current) {
         socket.current.destroy();
       }
@@ -73,7 +74,7 @@ function videocall() {
       });
 
       peer.on("signal", (data) => {
-        socket.current.emit("call_user", {
+        socket.current.emit("call_to_server", {
           userToCall: id,
           signalData: data,
           from: userId,
@@ -127,7 +128,7 @@ function videocall() {
 
   const leaveCall = () => {
     if (socket.current) {
-      socket.current.emit("end_call", { to: caller });
+      socket.current.emit("end_by_receiver", { caller });
     }
     if (socket.current) {
       socket.current.destroy();
@@ -223,16 +224,7 @@ function videocall() {
                 onChange={(e) => setIdToCall(e.target.value)}
               />
               <div className="call-button">
-                {callAccepted && !callEnded ? (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={leaveCall}
-                    style={{ marginTop: "20px" }}
-                  >
-                    End Call
-                  </Button>
-                ) : (
+                {callAccepted && !callEnded ? null : (
                   <IconButton
                     color="primary"
                     aria-label="call"

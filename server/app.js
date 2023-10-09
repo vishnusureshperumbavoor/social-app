@@ -32,8 +32,8 @@ io.on("connection", (socket) => {
   });
 
   // video call
-  socket.on("call_user", (data) => {
-    socket.to(data.userToCall).emit("call_user", {
+  socket.on("call_to_server", (data) => {
+    socket.to(data.userToCall).emit("call_to_receiver_client", {
       user_id: socket.id,
       signal: data.signalData,
       from: data.from,
@@ -45,9 +45,8 @@ io.on("connection", (socket) => {
     socket.to(data.to).emit("call_accepted", data.signal);
   });
 
-  socket.on("end_call", ({ to }) => {
-    console.log("instruction to end call to ",to);
-    socket.to(to).emit("call_ended");
+  socket.on("end_by_receiver", ({caller}) => {
+    socket.to(caller).emit("end_on_caller_client");
   });
 
   // disconnect
