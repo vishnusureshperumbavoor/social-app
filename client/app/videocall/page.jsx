@@ -12,10 +12,10 @@ import { Card } from "@mui/material";
 import { createTheme, ThemeProvider, Grid } from "@mui/material";
 require("dotenv").config;
 
-// const ringtoneAudio = new Audio("/audio/ringtone.wav");
-// ringtoneAudio.preload = "auto";
-// ringtoneAudio.loop = true;
-// ringtoneAudio.volume = 0.5;
+const ringtoneAudio = new Audio("/audio/ringtone.wav");
+ringtoneAudio.preload = "auto";
+ringtoneAudio.loop = true;
+ringtoneAudio.volume = 0.5;
 
 const darkTheme = createTheme({
   palette: {
@@ -23,6 +23,14 @@ const darkTheme = createTheme({
   },
 });
 
+function turnOffRingtone() {
+  ringtoneAudio.pause();
+  ringtoneAudio.currentTime = 0;
+}
+
+function turnOnRingtone() {
+  ringtoneAudio.play();
+}
 function videocall() {
   const [userId, setUserId] = useState("");
   const [stream, setStream] = useState(); // Example initial value is null
@@ -65,7 +73,7 @@ function videocall() {
       setCallerSignal(data.signal);
       setReceivingCall(true);
       setNotCalling(false);
-      // ringtoneAudio.play();
+      turnOnRingtone();
     });
 
     socket.current.on("end_on_caller_client", () => {
@@ -77,16 +85,18 @@ function videocall() {
       setNotCalling(true);
     });
 
-    socket.current.on("decline_call_by_caller",()=>{
-      setNotCalling(true)
-      setReceivingCall(false)
-    })
+    socket.current.on("decline_call_by_caller", () => {
+      setNotCalling(true);
+      setReceivingCall(false);
+      turnOffRingtone();
+    });
 
-    socket.current.on("decline_call_by_receiver",()=>{
-      setNotCalling(true)
-      setReceivingCall(false)
-      setCallUserId(false)
-    })
+    socket.current.on("decline_call_by_receiver", () => {
+      setNotCalling(true);
+      setReceivingCall(false);
+      setCallUserId(false);
+      turnOffRingtone();
+    });
   }, []);
 
   const callUser = (id) => {
@@ -120,7 +130,7 @@ function videocall() {
         setCallAccepted(true);
         peer.signal(data.signal);
         setCallerName(data.receiverName);
-        setCallUserId(false)
+        setCallUserId(false);
       });
 
       peerRef.current = peer;
@@ -131,8 +141,6 @@ function videocall() {
   };
 
   const answerCall = () => {
-    // ringtoneAudio.pause();
-    // ringtoneAudio.currentTime = 0;
     setReceivingCall(false);
     try {
       const peer = new Peer({
@@ -156,7 +164,8 @@ function videocall() {
       peer.signal(callerSignal);
       setCallAccepted(true);
       setNotCalling(false);
-      setCallUserId(false)
+      setCallUserId(false);
+      turnOffRingtone();
       peerRef.current = peer;
     } catch (error) {
       console.error("Error in answering the call:", error);
@@ -164,32 +173,30 @@ function videocall() {
   };
 
   const declineCallByCaller = () => {
-    socket.current.emit("decline_call_by_caller",(receiver))
+    socket.current.emit("decline_call_by_caller", receiver);
     setNotCalling(true);
     setReceivingCall(false);
-    setCallUserId(false)
-    // ringtoneAudio.pause();
+    setCallUserId(false);
+    turnOffRingtone()
   };
 
   const declineCallByReceiver = () => {
     socket.current.emit("decline_call_by_receiver", caller);
     setNotCalling(true);
     setReceivingCall(false);
-    // ringtoneAudio.pause();
+    turnOffRingtone();
   };
 
   const leaveCall = () => {
+    // const peer = peerRef.current;
+    // if (peer) {
+      //   peer.destroy();
+    // }
+    socket.current.emit("end_by_receiver", { caller, receiver });
+    // if (socket.current) {
+      //   socket.current.destroy();
+      // }
     setNotCalling(true);
-    const peer = peerRef.current;
-    if (peer) {
-      peer.destroy();
-    }
-    if (socket.current) {
-      socket.current.emit("end_by_receiver", { caller, receiver });
-    }
-    if (socket.current) {
-      socket.current.destroy();
-    }
     setCallAccepted(false);
     setCallEnded(true);
   };
@@ -251,53 +258,47 @@ function videocall() {
             </div>
           </Grid>
           <Grid item xs={12} md={6}>
-
             {notCalling && (
-                <div className="myId">
-                  <Typography
-                    style={{ paddingTop: "5px", paddingBottom: "5px" }}
+              <div className="myId">
+                <Typography style={{ paddingTop: "5px", paddingBottom: "5px" }}>
+                  User Id : {userId}
+                </Typography>
+                <TextField
+                  id="filled-basic"
+                  label="username"
+                  variant="filled"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  style={{ marginBottom: "1rem", color: "white" }}
+                />
+                <CopyToClipboard text={userId} style={{ marginBottom: "1rem" }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AssignmentIcon fontSize="large" />}
                   >
-                    User Id : {userId}
-                  </Typography>
-                  <TextField
-                    id="filled-basic"
-                    label="username"
-                    variant="filled"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    style={{ marginBottom: "1rem", color: "white" }}
-                  />
-                  <CopyToClipboard
-                    text={userId}
-                    style={{ marginBottom: "1rem" }}
-                  >
-                    <Button
-                      variant="contained"
+                    Copy ID
+                  </Button>
+                </CopyToClipboard>
+                <TextField
+                  id="filled-basic"
+                  label="User ID to call"
+                  variant="filled"
+                  value={idToCall}
+                  onChange={(e) => setIdToCall(e.target.value)}
+                />
+                <div className="call-button">
+                  {callAccepted && !callEnded ? null : (
+                    <IconButton
                       color="primary"
-                      startIcon={<AssignmentIcon fontSize="large" />}
+                      aria-label="call"
+                      onClick={() => callUser(idToCall)}
                     >
-                      Copy ID
-                    </Button>
-                  </CopyToClipboard>
-                  <TextField
-                    id="filled-basic"
-                    label="User ID to call"
-                    variant="filled"
-                    value={idToCall}
-                    onChange={(e) => setIdToCall(e.target.value)}
-                  />
-                  <div className="call-button">
-                    {callAccepted && !callEnded ? null : (
-                      <IconButton
-                        color="primary"
-                        aria-label="call"
-                        onClick={() => callUser(idToCall)}
-                      >
-                        <PhoneIcon fontSize="large" />
-                      </IconButton>
-                    )}
-                  </div>
+                      <PhoneIcon fontSize="large" />
+                    </IconButton>
+                  )}
                 </div>
+              </div>
             )}
 
             {callUserId && (

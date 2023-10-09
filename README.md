@@ -3,6 +3,11 @@
 ## Features
 * Group chats
 * Google authentication
+* Video Calls
+
+## Communication protocols
+* WebRTC (peer to peer video calls)
+* WebSocket (full duplex text communication)
 
 ## Technologies
 * NodeJS (Backend)
@@ -10,6 +15,7 @@
 * NextJS (Frontend)
 * Firebase (Google Authentication)
 * Socket.io (Duplex Communication)
+* simple-peer
 
 ## How to set up
 Clone the repository
