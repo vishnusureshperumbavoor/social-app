@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import { TextField, IconButton, Button } from "@mui/material";
+import { TextField, IconButton, Button, Typography } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import PhoneIcon from "@mui/icons-material/Phone";
 import "./page.css";
@@ -34,7 +34,7 @@ function videocall() {
   const socket = useRef(null);
 
   useEffect(() => {
-     socket.current = io.connect(process.env.NEXT_PUBLIC_SERVER_URL);
+    socket.current = io.connect(process.env.NEXT_PUBLIC_SERVER_URL);
     socket.current.on("user_id", (response) => {
       setUserId(response);
     });
@@ -43,7 +43,7 @@ function videocall() {
       .getUserMedia({ video: true, audio: true })
       .then((response) => {
         setStream(response);
-        if(myVideoRef.current){
+        if (myVideoRef.current) {
           myVideoRef.current.srcObject = response;
         }
       });
@@ -75,7 +75,7 @@ function videocall() {
       });
 
       peer.on("stream", (stream) => {
-        if(partnerVideoRef.current){
+        if (partnerVideoRef.current) {
           partnerVideoRef.current.srcObject = stream;
         }
       });
@@ -91,7 +91,7 @@ function videocall() {
   };
 
   const answerCall = () => {
-    setReceivingCall(false)
+    setReceivingCall(false);
     try {
       const peer = new Peer({
         initiator: false,
@@ -113,7 +113,6 @@ function videocall() {
 
       peer.signal(callerSignal);
       setCallAccepted(true);
-
     } catch (error) {
       console.error("Error in answering the call:", error);
     }
@@ -127,50 +126,53 @@ function videocall() {
     <>
       <ThemeProvider theme={darkTheme}>
         <Navbar />
-        <h1 style={{ textAlign: "center", color: "#fff" }}>VIDEO CALL</h1>
+        <h1 className="heading">VIDEO CALL</h1>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6} className="center-grid-item">
-            <div className="video-container">
-              <Card
-                sx={{
-                  minWidth: 275,
-                  backgroundColor: "#212121",
-                  padding: "4px",
-                }}
-              >
+          <Grid item xs={12} md={6}>
+            <div
+              className={`video-container ${
+                callAccepted && !callEnded ? "call-accepted" : ""
+              }`}
+            >
+              <div className="video">
+                <video
+                  playsInline
+                  muted
+                  ref={myVideoRef}
+                  autoPlay
+                  style={{ width: "300px" }}
+                />
+              </div>
+
+              {callAccepted && !callEnded ? (
                 <div className="video">
                   <video
                     playsInline
-                    muted
-                    ref={myVideoRef}
+                    ref={partnerVideoRef}
                     autoPlay
-                    style={{ width: "100%" }}
+                    style={{ width: "300px" }}
                   />
                 </div>
-              </Card>
-              <Card
-                sx={{
-                  minWidth: 275,
-                  backgroundColor: "#212121",
-                  padding: "4px",
-                }}
-              >
-                <div className="video">
-                  {callAccepted && !callEnded ? (
-                    <video
-                      playsInline
-                      ref={partnerVideoRef}
-                      autoPlay
-                      style={{ width: "300px" }}
-                    />
-                  ) : null}
-                </div>
-              </Card>
+              ) : null}
             </div>
+            {receivingCall ? (
+              <div className="caller">
+                <h1>{name} is calling...</h1>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={answerCall}
+                >
+                  Answer
+                </Button>
+              </div>
+            ) : null}
           </Grid>
-          <Grid item xs={12} md={6} className="center-grid-item">
+          <Grid item xs={12} md={6}>
             <div className="myId">
-              userid : {userId}
+              <Typography style={{ paddingTop: "5px", paddingBottom: "5px" }}>
+                User Id : {userId}
+              </Typography>
               <TextField
                 id="filled-basic"
                 label="username"
@@ -201,6 +203,7 @@ function videocall() {
                     variant="contained"
                     color="secondary"
                     onClick={leaveCall}
+                    style={{ marginTop: "20px" }}
                   >
                     End Call
                   </Button>
@@ -216,16 +219,6 @@ function videocall() {
               </div>
             </div>
           </Grid>
-        </Grid>
-        <Grid container>
-          {receivingCall ? (
-            <div className="caller">
-              <h1>{name} is calling...</h1>
-              <Button variant="contained" color="primary" onClick={answerCall}>
-                Answer
-              </Button>
-            </div>
-          ) : null}
         </Grid>
       </ThemeProvider>
     </>
