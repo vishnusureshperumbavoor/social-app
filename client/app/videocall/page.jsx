@@ -29,7 +29,7 @@ function videocall() {
   const [idToCall, setIdToCall] = useState(""); // Example initial value is an empty string
   const [callEnded, setCallEnded] = useState(false); // Example initial value is false
   const [name, setName] = useState("daddy");
-  const [callerName,setCallerName] = useState("");
+  const [callerName, setCallerName] = useState("");
 
   const myVideoRef = useRef(null);
   const partnerVideoRef = useRef(null);
@@ -92,9 +92,10 @@ function videocall() {
         }
       });
 
-      socket.current.on("call_accepted", (signal) => {
+      socket.current.on("call_accepted", (data) => {
         setCallAccepted(true);
-        peer.signal(signal);
+        peer.signal(data.signal);
+        setCallerName(data.receiverName);
       });
       peerRef.current = peer;
     } catch (error) {
@@ -117,7 +118,11 @@ function videocall() {
       });
 
       peer.on("signal", (data) => {
-        socket.current.emit("answer_call", { signal: data, to: caller });
+        socket.current.emit("answer_call", {
+          signal: data,
+          to: caller,
+          receiverName: name,
+        });
       });
 
       peer.on("stream", (remoteStream) => {

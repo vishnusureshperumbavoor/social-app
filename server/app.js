@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("answer_call", (data) => {
-    socket.to(data.to).emit("call_accepted", data.signal);
+    socket.to(data.to).emit("call_accepted", data);
   });
 
   socket.on("end_by_receiver", ({ caller,receiver }) => {
