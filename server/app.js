@@ -33,7 +33,6 @@ io.on("connection", (socket) => {
 
   // video call
   socket.on("call_user", (data) => {
-    console.log("started calling user");
     socket.to(data.userToCall).emit("call_user", {
       user_id: socket.id,
       signal: data.signalData,
@@ -43,8 +42,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("answer_call", (data) => {
-    console.log("receiver clicked on answer call");
     socket.to(data.to).emit("call_accepted", data.signal);
+  });
+
+  socket.on("end_call", ({ to }) => {
+    console.log("instruction to end call to ",to);
+    socket.to(to).emit("call_ended");
   });
 
   // disconnect

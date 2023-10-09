@@ -49,11 +49,18 @@ function videocall() {
       });
 
     socket.current.on("call_user", (data) => {
-      setUserId(data.user_id);
       setCaller(data.from);
       setName(data.name);
       setCallerSignal(data.signal);
       setReceivingCall(true);
+    });
+
+    socket.current.on("call_ended", () => {
+      if (socket.current) {
+        socket.current.destroy();
+      }
+      setCallAccepted(false);
+      setCallEnded(true);
     });
   }, []);
 
@@ -119,6 +126,13 @@ function videocall() {
   };
 
   const leaveCall = () => {
+    if (socket.current) {
+      socket.current.emit("end_call", { to: caller });
+    }
+    if (socket.current) {
+      socket.current.destroy();
+    }
+    setCallAccepted(false);
     setCallEnded(true);
   };
 
@@ -164,6 +178,17 @@ function videocall() {
                   onClick={answerCall}
                 >
                   Answer
+                </Button>
+              </div>
+            ) : null}
+            {callAccepted && !callEnded ? (
+              <div className="end-call">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={leaveCall}
+                >
+                  End Call
                 </Button>
               </div>
             ) : null}
