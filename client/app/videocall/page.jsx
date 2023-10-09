@@ -12,10 +12,10 @@ import { Card } from "@mui/material";
 import { createTheme, ThemeProvider, Grid } from "@mui/material";
 require("dotenv").config;
 
-const ringtoneAudio = new Audio("/audio/ringtone.wav");
-ringtoneAudio.preload = "auto";
-ringtoneAudio.loop = true;
-ringtoneAudio.volume = 0.5;
+// const ringtoneAudio = new Audio("/audio/ringtone.wav");
+// ringtoneAudio.preload = "auto";
+// ringtoneAudio.loop = true;
+// ringtoneAudio.volume = 0.5;
 
 const darkTheme = createTheme({
   palette: {
@@ -74,8 +74,19 @@ function videocall() {
       }
       setCallAccepted(false);
       setCallEnded(true);
-      setNotCalling(false);
+      setNotCalling(true);
     });
+
+    socket.current.on("decline_call_by_caller",()=>{
+      setNotCalling(true)
+      setReceivingCall(false)
+    })
+
+    socket.current.on("decline_call_by_receiver",()=>{
+      setNotCalling(true)
+      setReceivingCall(false)
+      setCallUserId(false)
+    })
   }, []);
 
   const callUser = (id) => {
@@ -109,7 +120,9 @@ function videocall() {
         setCallAccepted(true);
         peer.signal(data.signal);
         setCallerName(data.receiverName);
+        setCallUserId(false)
       });
+
       peerRef.current = peer;
     } catch (error) {
       alert(error);
@@ -118,19 +131,14 @@ function videocall() {
   };
 
   const answerCall = () => {
-    ringtoneAudio.pause();
-    ringtoneAudio.currentTime = 0;
+    // ringtoneAudio.pause();
+    // ringtoneAudio.currentTime = 0;
     setReceivingCall(false);
-
     try {
       const peer = new Peer({
         initiator: false,
         trickle: false,
         stream: stream,
-      });
-
-      peer.on("connect", () => {
-        console.log("Connected to peer answering call");
       });
 
       peer.on("signal", (data) => {
@@ -148,18 +156,26 @@ function videocall() {
       peer.signal(callerSignal);
       setCallAccepted(true);
       setNotCalling(false);
-
+      setCallUserId(false)
       peerRef.current = peer;
     } catch (error) {
       console.error("Error in answering the call:", error);
     }
   };
 
-  const declineCall = () => {
+  const declineCallByCaller = () => {
+    socket.current.emit("decline_call_by_caller",(receiver))
     setNotCalling(true);
     setReceivingCall(false);
-    ringtoneAudio.pause();
-    ringtoneAudio.currentTime = 0;
+    setCallUserId(false)
+    // ringtoneAudio.pause();
+  };
+
+  const declineCallByReceiver = () => {
+    socket.current.emit("decline_call_by_receiver", caller);
+    setNotCalling(true);
+    setReceivingCall(false);
+    // ringtoneAudio.pause();
   };
 
   const leaveCall = () => {
@@ -308,7 +324,7 @@ function videocall() {
                 <Button
                   variant="contained"
                   style={{ backgroundColor: "red", color: "white" }}
-                  onClick={declineCall}
+                  onClick={declineCallByCaller}
                 >
                   Decline
                 </Button>
@@ -334,7 +350,7 @@ function videocall() {
                 <Button
                   variant="contained"
                   style={{ backgroundColor: "red", color: "white" }}
-                  onClick={declineCall}
+                  onClick={declineCallByReceiver}
                 >
                   Decline
                 </Button>

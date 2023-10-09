@@ -47,11 +47,17 @@ io.on("connection", (socket) => {
   });
 
   socket.on("end_by_receiver", ({ caller,receiver }) => {
-    console.log("turn off at client side of = ", caller);
-    console.log("turn off at client side of = ", receiver);
     socket.to(caller).emit("end_on_caller_client");
     socket.to(receiver).emit("end_on_caller_client");
   });
+
+  socket.on("decline_call_by_caller",(receiver)=>{
+    socket.to(receiver).emit("decline_call_by_caller");
+  })
+
+  socket.on("decline_call_by_receiver",(caller)=>{
+    socket.to(caller).emit("decline_call_by_receiver");
+  })
 
   // disconnect
   socket.on("disconnect", () => {
