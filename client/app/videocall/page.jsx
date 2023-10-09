@@ -33,6 +33,7 @@ function videocall() {
   const myVideoRef = useRef(null);
   const partnerVideoRef = useRef(null);
   const socket = useRef(null);
+  const peerRef = useRef(null);
 
   useEffect(() => {
     socket.current = io.connect(process.env.NEXT_PUBLIC_SERVER_URL);
@@ -66,6 +67,7 @@ function videocall() {
   }, []);
 
   const callUser = (id) => {
+    setReceiver(id);
     try {
       const peer = new Peer({
         initiator: true,
@@ -92,6 +94,7 @@ function videocall() {
         setCallAccepted(true);
         peer.signal(signal);
       });
+      peerRef.current = peer;
     } catch (error) {
       alert(error);
       console.error("Error in callUser:", error);
@@ -121,14 +124,20 @@ function videocall() {
 
       peer.signal(callerSignal);
       setCallAccepted(true);
+
+      peerRef.current = peer;
     } catch (error) {
       console.error("Error in answering the call:", error);
     }
   };
 
   const leaveCall = () => {
+    const peer = peerRef.current;
+    if (peer) {
+      peer.destroy();
+    }
     if (socket.current) {
-      socket.current.emit("end_by_receiver", { caller });
+      socket.current.emit("end_by_receiver", { caller, receiver });
     }
     if (socket.current) {
       socket.current.destroy();

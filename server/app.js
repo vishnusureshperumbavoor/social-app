@@ -15,7 +15,7 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
-  socket.emit("user_id",socket.id);
+  socket.emit("user_id", socket.id);
 
   // group messaging
   socket.on("join_room", (data) => {
@@ -38,6 +38,7 @@ io.on("connection", (socket) => {
       signal: data.signalData,
       from: data.from,
       name: data.name,
+      to: data.userToCall,
     });
   });
 
@@ -45,8 +46,11 @@ io.on("connection", (socket) => {
     socket.to(data.to).emit("call_accepted", data.signal);
   });
 
-  socket.on("end_by_receiver", ({caller}) => {
+  socket.on("end_by_receiver", ({ caller,receiver }) => {
+    console.log("turn off at client side of = ", caller);
+    console.log("turn off at client side of = ", receiver);
     socket.to(caller).emit("end_on_caller_client");
+    socket.to(receiver).emit("end_on_caller_client");
   });
 
   // disconnect
