@@ -132,6 +132,10 @@ function videocall() {
     }
   };
 
+  const declineCall = () => {
+    setReceivingCall(false);
+  };
+
   const leaveCall = () => {
     const peer = peerRef.current;
     if (peer) {
@@ -185,10 +189,21 @@ function videocall() {
                 <h1>{name} is calling...</h1>
                 <Button
                   variant="contained"
-                  color="primary"
+                  style={{
+                    backgroundColor: "green",
+                    color: "white",
+                    marginRight: "20px",
+                  }}
                   onClick={answerCall}
                 >
                   Answer
+                </Button>
+                <Button
+                  variant="contained"
+                  style={{ backgroundColor: "red", color: "white" }}
+                  onClick={declineCall}
+                >
+                  Decline
                 </Button>
               </div>
             ) : null}
@@ -196,7 +211,7 @@ function videocall() {
               <div className="end-call">
                 <Button
                   variant="contained"
-                  color="secondary"
+                  style={{ backgroundColor: "red", color: "white" }}
                   onClick={leaveCall}
                 >
                   End Call
